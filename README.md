@@ -14,8 +14,8 @@ Open Deep Research is an experimental, fully open-source research assistant that
 
 Clone the repository:
 ```bash
-git clone https://github.com/langchain-ai/open_deep_research.git
-cd open_deep_research
+git clone https://github.com/NatBala/deep_research.git
+cd deep_research
 ```
 
 Then edit the `.env` file to customize the environment variables (for model selection, search tools, and other configuration settings):
@@ -51,6 +51,40 @@ Use this to open the Studio UI:
 - 🚀 API: http://127.0.0.1:2024
 - 🎨 Studio UI: https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
 - 📚 API Docs: http://127.0.0.1:2024/docs
+```
+
+### New Features Added
+
+#### Simple Research Workflow
+A streamlined 3-section research workflow that:
+1. Takes a research topic and creates an initial summary with exactly 3 sections
+2. Generates targeted sub-queries for each section
+3. Retrieves content using Tavily search
+4. Creates detailed summaries for each section based on retrieved content
+5. Generates a comprehensive final report
+
+**Technologies Used:**
+- 🔍 **Tavily Search** for content retrieval
+- 🤖 **OpenAI GPT-4o** for all AI tasks
+- 🕸️ **LangGraph** for workflow orchestration
+
+**Key Improvements:**
+- ✅ Fixed Windows date formatting issues
+- ✅ Updated to use OpenAI GPT-4o by default instead of Claude
+- ✅ Removed human-in-the-loop functionality for fully automated operation
+- ✅ Fixed parallel processing issues with proper state management
+- ✅ Added streamlined simple_graph.py with 3-section workflow
+
+**Usage:**
+```python
+from open_deep_research.simple_graph import simple_graph
+import asyncio
+
+async def run_research():
+    result = await simple_graph.ainvoke({"topic": "Artificial Intelligence in Healthcare"})
+    print(result["final_report"])
+
+asyncio.run(run_research())
 ```
 
 #### Multi-agent
@@ -114,34 +148,48 @@ See [src/open_deep_research/graph.ipynb](src/open_deep_research/graph.ipynb) and
 
 ## Open Deep Research Implementations
 
-Open Deep Research features two distinct implementation approaches, each with its own strengths:
+Open Deep Research features three distinct implementation approaches, each with its own strengths:
 
-## 1. Graph-based Workflow Implementation (`src/open_deep_research/graph.py`)
+## 1. Simple Research Workflow Implementation (`src/open_deep_research/simple_graph.py`) - NEW!
+
+The simple research workflow provides a streamlined, fully automated approach:
+
+- **Automatic 3-Section Structure**: Always generates exactly 3 research sections
+- **Parallel Processing**: All sections are researched simultaneously for faster execution
+- **No Human Interaction**: Fully automated from topic to final report
+- **Tavily + OpenAI Only**: Simplified technology stack using only Tavily search and OpenAI GPT-4o
+- **Fixed Parallel Processing**: Uses state reducers to properly handle concurrent section processing
+
+This implementation is ideal for quick, automated research reports with consistent structure and fast execution.
+
+Available in LangGraph Studio as `simple_research` graph.
+
+## 2. Graph-based Workflow Implementation (`src/open_deep_research/graph.py`)
 
 The graph-based implementation follows a structured plan-and-execute workflow:
 
 - **Planning Phase**: Uses a planner model to analyze the topic and generate a structured report plan
-- **Human-in-the-Loop**: Allows for human feedback and approval of the report plan before proceeding
+- **Automated Processing**: Human-in-the-loop functionality has been removed for fully automated operation
 - **Sequential Research Process**: Creates sections one by one with reflection between search iterations
 - **Section-Specific Research**: Each section has dedicated search queries and content retrieval
 - **Supports Multiple Search Tools**: Works with all search providers (Tavily, Perplexity, Exa, ArXiv, PubMed, Linkup, etc.)
 
-This implementation provides a more interactive experience with greater control over the report structure, making it ideal for situations where report quality and accuracy are critical.
+This implementation provides comprehensive research capabilities with greater control over the report structure, making it ideal for situations where report quality and accuracy are critical.
 
 You can customize the research assistant workflow through several parameters:
 
 - `report_structure`: Define a custom structure for your report (defaults to a standard research report format)
 - `number_of_queries`: Number of search queries to generate per section (default: 2)
 - `max_search_depth`: Maximum number of reflection and search iterations (default: 2)
-- `planner_provider`: Model provider for planning phase (default: "anthropic", but can be any provider from supported integrations with `init_chat_model` as listed [here](https://python.langchain.com/api_reference/langchain/chat_models/langchain.chat_models.base.init_chat_model.html))
-- `planner_model`: Specific model for planning (default: "claude-3-7-sonnet-latest")
+- `planner_provider`: Model provider for planning phase (default: "openai")
+- `planner_model`: Specific model for planning (default: "gpt-4o")
 - `planner_model_kwargs`: Additional parameter for planner_model
-- `writer_provider`: Model provider for writing phase (default: "anthropic", but can be any provider from supported integrations with `init_chat_model` as listed [here](https://python.langchain.com/api_reference/langchain/chat_models/langchain.chat_models.base.init_chat_model.html))
-- `writer_model`: Model for writing the report (default: "claude-3-5-sonnet-latest")
+- `writer_provider`: Model provider for writing phase (default: "openai")
+- `writer_model`: Model for writing the report (default: "gpt-4o")
 - `writer_model_kwargs`: Additional parameter for writer_model
 - `search_api`: API to use for web searches (default: "tavily", options include "perplexity", "exa", "arxiv", "pubmed", "linkup")
 
-## 2. Multi-Agent Implementation (`src/open_deep_research/multi_agent.py`)
+## 3. Multi-Agent Implementation (`src/open_deep_research/multi_agent.py`)
 
 The multi-agent implementation uses a supervisor-researcher architecture:
 
@@ -155,8 +203,8 @@ This implementation focuses on efficiency and parallelization, making it ideal f
 
 You can customize the multi-agent implementation through several parameters:
 
-- `supervisor_model`: Model for the supervisor agent (default: "anthropic:claude-3-5-sonnet-latest")
-- `researcher_model`: Model for researcher agents (default: "anthropic:claude-3-5-sonnet-latest") 
+- `supervisor_model`: Model for the supervisor agent (default: "openai:gpt-4o")
+- `researcher_model`: Model for researcher agents (default: "openai:gpt-4o") 
 - `number_of_queries`: Number of search queries to generate per section (default: 2)
 - `search_api`: API to use for web searches (default: "tavily", options include "duckduckgo", "none")
 - `ask_for_clarification`: Whether the supervisor should ask clarifying questions before research (default: false) - **Important**: Set to `true` to enable the Question tool for the supervisor agent
@@ -180,7 +228,7 @@ The multi-agent implementation (`src/open_deep_research/multi_agent.py`) support
 
 ### Filesystem Server Example
 
-#### SKK
+#### Configuration
 
 ```python
 config = {
@@ -224,23 +272,17 @@ MCP prompt:
 ```
 CRITICAL: You MUST follow this EXACT sequence when using filesystem tools:
 
-1. FIRST: Call `list_allowed_directories` tool to discover allowed directories
-2. SECOND: Call `list_directory` tool on a specific directory from step 1 to see available files  
-3. THIRD: Call `read_file` tool to read specific files found in step 2
+Step 1: Use the `list_allowed_directories` tool to get the list of allowed directories.
+Step 2: Use the `list_directory` tool to explore directories and find files.
+Step 3: Use the `read_file` tool to read files in the allowed directory.
 
-DO NOT call `list_directory` or `read_file` until you have first called `list_allowed_directories`. You must discover the allowed directories before attempting to browse or read files.
+Never assume file paths exist. Always check directories first.
 ```
 
-MCP tools: 
-```
-list_allowed_directories
-list_directory 
-read_file
-```
+#### Example
 
-Example test topic and follow-up feedback that you can provide that will reference the included file: 
+Example of a question that a user asked the multi-agent system:
 
-Topic:
 ```
 I want an overview of vibe coding
 ```
@@ -436,4 +478,4 @@ Follow the [quickstart](#-quickstart) to start LangGraph server locally.
 
 ### Hosted deployment
  
-You can easily deploy to [LangGraph Platform](https://langchain-ai.github.io/langgraph/concepts/#deployment-options). 
+You can easily deploy to [LangGraph Platform](https://langchain-ai.github.io/langgraph/concepts/#deployment-options).
