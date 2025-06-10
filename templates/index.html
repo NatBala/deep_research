@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Research Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🔍</div>
+                    <h1>Deep Research Assistant</h1>
+                </div>
+                <div class="subtitle">AI-powered research with real-time progress</div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                
+                <!-- Input Section -->
+                <div id="input-section" class="input-section">
+                    <div class="input-card">
+                        <h2>What would you like to research?</h2>
+                        <div class="input-group">
+                            <textarea 
+                                id="topic-input" 
+                                placeholder="Enter your research topic here... (e.g., 'Artificial Intelligence in Healthcare', 'Climate Change Impact on Agriculture')"
+                                rows="3"
+                            ></textarea>
+                            <button id="start-research-btn" class="research-btn">
+                                <span class="btn-text">Start Research</span>
+                                <span class="btn-icon">→</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Example Topics -->
+                        <div class="example-topics">
+                            <span class="example-label">Try these examples:</span>
+                            <div class="topic-chips">
+                                <button class="topic-chip" data-topic="Artificial Intelligence in Healthcare">AI in Healthcare</button>
+                                <button class="topic-chip" data-topic="Climate Change Impact on Agriculture">Climate & Agriculture</button>
+                                <button class="topic-chip" data-topic="Blockchain Technology Applications">Blockchain Applications</button>
+                                <button class="topic-chip" data-topic="Remote Work Trends 2024">Remote Work Trends</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Section -->
+                <div id="progress-section" class="progress-section" style="display: none;">
+                    <div class="progress-card">
+                        <div class="progress-header">
+                            <h3 id="current-step">Initializing...</h3>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar">
+                                    <div id="progress-fill" class="progress-fill"></div>
+                                </div>
+                                <span id="progress-percent" class="progress-percent">0%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="status-message">
+                            <p id="status-message">Starting research process...</p>
+                        </div>
+
+                        <!-- AI Thinking Display -->
+                        <div id="thinking-container" class="thinking-container" style="display: none;">
+                            <div class="thinking-header">
+                                <div class="thinking-icon">🤔</div>
+                                <span>AI is thinking...</span>
+                                <div class="typing-indicator">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                            <div id="thinking-content" class="thinking-content"></div>
+                        </div>
+
+                        <!-- Research Preview -->
+                        <div id="sections-preview" class="sections-preview" style="display: none;"></div>
+                        <div id="current-queries" class="current-queries" style="display: none;"></div>
+
+                        <!-- Research Steps -->
+                        <div class="research-steps">
+                            <div class="step" id="step-planning">
+                                <div class="step-icon">📋</div>
+                                <div class="step-content">
+                                    <h4>Planning</h4>
+                                    <p>Creating research outline with 3 sections</p>
+                                </div>
+                                <div class="step-status">⏳</div>
+                            </div>
+                            
+                            <div class="step" id="step-query_generation">
+                                <div class="step-icon">🔍</div>
+                                <div class="step-content">
+                                    <h4>Query Generation</h4>
+                                    <p>Generating targeted search queries</p>
+                                </div>
+                                <div class="step-status">⏳</div>
+                            </div>
+                            
+                            <div class="step" id="step-researching">
+                                <div class="step-icon">🌐</div>
+                                <div class="step-content">
+                                    <h4>Web Research</h4>
+                                    <p>Gathering information from reliable sources</p>
+                                </div>
+                                <div class="step-status">⏳</div>
+                            </div>
+                            
+                            <div class="step" id="step-writing">
+                                <div class="step-icon">✍️</div>
+                                <div class="step-content">
+                                    <h4>Content Writing</h4>
+                                    <p>Analyzing data and writing detailed sections</p>
+                                </div>
+                                <div class="step-status">⏳</div>
+                            </div>
+                            
+                            <div class="step" id="step-finalizing">
+                                <div class="step-icon">📄</div>
+                                <div class="step-content">
+                                    <h4>Final Report</h4>
+                                    <p>Compiling comprehensive research report</p>
+                                </div>
+                                <div class="step-status">⏳</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="results-section" class="results-section" style="display: none;">
+                    <div class="results-header">
+                        <h2>Research Complete!</h2>
+                        <div class="results-actions">
+                            <button id="copy-report-btn" class="action-btn">
+                                <span>📋</span> Copy Report
+                            </button>
+                            <button id="download-report-btn" class="action-btn">
+                                <span>📥</span> Download
+                            </button>
+                            <button id="new-research-btn" class="action-btn primary">
+                                <span>🔍</span> New Research
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Research Summary -->
+                    <div class="research-summary">
+                        <div class="summary-card">
+                            <h3>Research Summary</h3>
+                            <div id="research-metadata" class="metadata">
+                                <div class="meta-item">
+                                    <span class="meta-label">Topic:</span>
+                                    <span id="meta-topic" class="meta-value">-</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Sections:</span>
+                                    <span id="meta-sections" class="meta-value">3</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Completed:</span>
+                                    <span id="meta-timestamp" class="meta-value">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Final Report -->
+                    <div class="report-container">
+                        <div class="report-header">
+                            <h3>📄 Final Report</h3>
+                            <button id="toggle-raw-btn" class="toggle-btn">View Raw Markdown</button>
+                        </div>
+                        <div id="rendered-report" class="rendered-report"></div>
+                        <div id="raw-report" class="raw-report" style="display: none;">
+                            <pre><code id="raw-markdown" class="language-markdown"></code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Section -->
+                <div id="error-section" class="error-section" style="display: none;">
+                    <div class="error-card">
+                        <div class="error-icon">⚠️</div>
+                        <h3>Something went wrong</h3>
+                        <p id="error-message">An error occurred during research.</p>
+                        <button id="retry-btn" class="retry-btn">Try Again</button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html> 
