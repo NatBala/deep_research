@@ -1,9 +1,9 @@
 /**
- * Deep Research Assistant - Frontend JavaScript
+ * Deep Insights Assistant - Frontend JavaScript
  * Handles WebSocket connections, UI updates, and user interactions
  */
 
-class ResearchApp {
+class InsightsApp {
     constructor() {
         this.ws = null;
         this.sessionId = this.generateSessionId();
@@ -109,7 +109,7 @@ class ResearchApp {
         const topic = topicInput.value.trim();
         
         if (!topic) {
-            this.showToast('Please enter a research topic', 'error');
+            this.showToast('Please enter an analysis topic', 'error');
             return;
         }
         
@@ -129,7 +129,7 @@ class ResearchApp {
         // Reset progress
         this.resetProgress();
         
-        // Send research request
+        // Send analysis request
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             this.ws.send(JSON.stringify({
                 type: 'start_research',
@@ -228,7 +228,7 @@ class ResearchApp {
         const queriesContainer = document.getElementById('current-queries');
         if (queriesContainer) {
             queriesContainer.innerHTML = `
-                <h4>🔍 Researching: ${sectionName}</h4>
+                <h4>🔍 Analyzing: ${sectionName}</h4>
                 <ul class="query-list">
                     ${queries.map(query => `<li>${query}</li>`).join('')}
                 </ul>
@@ -239,14 +239,14 @@ class ResearchApp {
     
     getStepTitle(step) {
         const titles = {
-            'initializing': 'Initializing Research',
-            'planning': 'Creating Research Plan',
+            'initializing': 'Initializing Analysis',
+            'planning': 'Creating Analysis Plan',
             'planning_complete': 'Planning Complete',
             'query_generation': 'Generating Queries',
-            'researching': 'Conducting Research',
+            'researching': 'Conducting Analysis',
             'writing': 'Writing Sections',
             'finalizing': 'Finalizing Report',
-            'complete': 'Research Complete'
+            'complete': 'Analysis Complete'
         };
         return titles[step] || 'Processing...';
     }
@@ -329,7 +329,7 @@ class ResearchApp {
         document.getElementById('progress-fill').style.width = '0%';
         document.getElementById('progress-percent').textContent = '0%';
         document.getElementById('current-step').textContent = 'Initializing...';
-        document.getElementById('status-message').textContent = 'Starting research process...';
+        document.getElementById('status-message').textContent = 'Starting analysis process...';
         
         // Reset all steps
         document.querySelectorAll('.step').forEach(step => {
@@ -362,7 +362,7 @@ class ResearchApp {
         const a = document.createElement('a');
         
         a.href = url;
-        a.download = `research_report_${this.currentTopic.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.md`;
+        a.download = `insights_report_${this.currentTopic.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.md`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -474,7 +474,7 @@ class ResearchApp {
 
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new ResearchApp();
+    new InsightsApp();
 });
 
 // Add toast animations

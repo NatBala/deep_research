@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deep Research Assistant</title>
+    <title>Deep Insights Assistant</title>
     <link rel="stylesheet" href="/static/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
@@ -14,10 +14,10 @@
         <header class="header">
             <div class="header-content">
                 <div class="logo">
-                    <div class="logo-icon">🔍</div>
-                    <h1>Deep Research Assistant</h1>
+                    <div class="logo-icon">🧠</div>
+                    <h1>Deep Insights Assistant</h1>
                 </div>
-                <div class="subtitle">AI-powered research with real-time progress</div>
+                <div class="subtitle">AI-powered insights with real-time progress</div>
             </div>
         </header>
 
@@ -28,27 +28,27 @@
                 <!-- Input Section -->
                 <div id="input-section" class="input-section">
                     <div class="input-card">
-                        <h2>What would you like to research?</h2>
+                        <h2>What would you like to explore?</h2>
                         <div class="input-group">
                             <textarea 
                                 id="topic-input" 
-                                placeholder="Enter your research topic here... (e.g., 'Artificial Intelligence in Healthcare', 'Climate Change Impact on Agriculture')"
+                                placeholder="Enter your AI research topic here... (e.g., 'Model Context Protocol Implementation', 'Voice to Voice Agent Architecture')"
                                 rows="3"
                             ></textarea>
                             <button id="start-research-btn" class="research-btn">
-                                <span class="btn-text">Start Research</span>
+                                <span class="btn-text">Start Analysis</span>
                                 <span class="btn-icon">→</span>
                             </button>
                         </div>
                         
                         <!-- Example Topics -->
                         <div class="example-topics">
-                            <span class="example-label">Try these examples:</span>
+                            <span class="example-label">Try these AI examples:</span>
                             <div class="topic-chips">
-                                <button class="topic-chip" data-topic="Artificial Intelligence in Healthcare">AI in Healthcare</button>
-                                <button class="topic-chip" data-topic="Climate Change Impact on Agriculture">Climate & Agriculture</button>
-                                <button class="topic-chip" data-topic="Blockchain Technology Applications">Blockchain Applications</button>
-                                <button class="topic-chip" data-topic="Remote Work Trends 2024">Remote Work Trends</button>
+                                <button class="topic-chip" data-topic="Model Context Protocol Implementation and Architecture">Model Context Protocol</button>
+                                <button class="topic-chip" data-topic="Agent to Agent Communication Frameworks and Protocols">A2A Agent Communication</button>
+                                <button class="topic-chip" data-topic="Advanced Reasoning Models and Chain of Thought Techniques">Reasoning Models</button>
+                                <button class="topic-chip" data-topic="Voice to Voice Agent Systems and Real-time Audio Processing">Voice to Voice Agents</button>
                             </div>
                         </div>
                     </div>
@@ -142,7 +142,7 @@
                 <!-- Results Section -->
                 <div id="results-section" class="results-section" style="display: none;">
                     <div class="results-header">
-                        <h2>Research Complete!</h2>
+                        <h2>Analysis Complete!</h2>
                         <div class="results-actions">
                             <button id="copy-report-btn" class="action-btn">
                                 <span>📋</span> Copy Report
@@ -151,15 +151,15 @@
                                 <span>📥</span> Download
                             </button>
                             <button id="new-research-btn" class="action-btn primary">
-                                <span>🔍</span> New Research
+                                <span>🧠</span> New Analysis
                             </button>
                         </div>
                     </div>
 
-                    <!-- Research Summary -->
+                    <!-- Analysis Summary -->
                     <div class="research-summary">
                         <div class="summary-card">
-                            <h3>Research Summary</h3>
+                            <h3>Analysis Summary</h3>
                             <div id="research-metadata" class="metadata">
                                 <div class="meta-item">
                                     <span class="meta-label">Topic:</span>

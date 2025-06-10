@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Real Research App - Deep Research Assistant with Actual AI Research
+Deep Insights App - Deep Insights Assistant with Actual AI Research
 
-This version uses real OpenAI and Tavily APIs to conduct actual research.
+This version uses real OpenAI and Tavily APIs to conduct actual AI insights research.
 """
 
 import asyncio
@@ -42,7 +42,7 @@ except ImportError as e:
 
 
 if FASTAPI_AVAILABLE:
-    app = FastAPI(title="Deep Research Assistant - Real Research", description="AI-powered research with real-time progress")
+    app = FastAPI(title="Deep Insights Assistant - AI Analysis", description="AI-powered insights with real-time progress")
     
     # Mount static files and templates
     app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -91,7 +91,7 @@ async def run_real_research(session_id: str, topic: str):
         await manager.send_update(session_id, {
             "type": "status",
             "step": "initializing",
-            "message": f"🚀 Starting AI research on: {topic}",
+            "message": f"🚀 Starting AI analysis on: {topic}",
             "progress": 5
         })
         
@@ -126,7 +126,7 @@ async def run_real_research(session_id: str, topic: str):
                 await manager.send_update(session_id, {
                     "type": "status",
                     "step": "planning",
-                    "message": f"📋 Research plan created with {len(sections)} sections",
+                    "message": f"📋 Analysis plan created with {len(sections)} sections",
                     "progress": current_progress,
                     "details": {
                         "sections": [{"name": k, "description": v} for k, v in sections.items()]
@@ -135,7 +135,7 @@ async def run_real_research(session_id: str, topic: str):
                 
                 await manager.send_update(session_id, {
                     "type": "thinking",
-                    "message": f"🤔 Planning comprehensive research approach...\n\n" +
+                    "message": f"🤔 Planning comprehensive analysis approach...\n\n" +
                               f"**Identified Key Areas:**\n" +
                               "\n".join([f"• **{k}:** {v}" for k, v in sections.items()]),
                     "progress": current_progress
@@ -161,7 +161,7 @@ async def run_real_research(session_id: str, topic: str):
                     await manager.send_update(session_id, {
                         "type": "status", 
                         "step": "researching",
-                        "message": f"🔍 Completed research for: {section_name}",
+                        "message": f"🔍 Completed analysis for: {section_name}",
                         "progress": current_progress,
                         "details": {
                             "section": section_name,
@@ -176,7 +176,7 @@ async def run_real_research(session_id: str, topic: str):
                         "message": f"🔬 **Deep diving into {section_name}**\n\n" +
                                   f"**Search Queries Generated:**\n" +
                                   "\n".join([f"• {q}" for q in queries]) +
-                                  f"\n\n**Key Findings:** Research data collected and analyzed...",
+                                  f"\n\n**Key Findings:** Analysis data collected and processed...",
                         "progress": current_progress
                     })
                     
@@ -185,14 +185,14 @@ async def run_real_research(session_id: str, topic: str):
                 await manager.send_update(session_id, {
                     "type": "status",
                     "step": "finalizing",
-                    "message": "📝 Compiling comprehensive research report...",
+                    "message": "📝 Compiling comprehensive analysis report...",
                     "progress": current_progress
                 })
                 
                 await manager.send_update(session_id, {
                     "type": "thinking",
-                    "message": "✍️ **Synthesizing Research Findings**\n\n" +
-                              "• Analyzing collected data from all sections\n" +
+                    "message": "✍️ **Synthesizing Analysis Findings**\n\n" +
+                              "• Processing collected data from all sections\n" +
                               "• Creating executive summary\n" +
                               "• Structuring final comprehensive report\n" +
                               "• Adding conclusions and insights",
@@ -205,7 +205,7 @@ async def run_real_research(session_id: str, topic: str):
                 await manager.send_update(session_id, {
                     "type": "complete",
                     "step": "complete",
-                    "message": "✅ AI Research completed successfully!",
+                    "message": "✅ AI Analysis completed successfully!",
                     "progress": 100,
                     "result": {
                         "topic": topic,
@@ -264,13 +264,13 @@ def main():
         return
     
     print("\n" + "="*60)
-    print("🚀 DEEP RESEARCH ASSISTANT - REAL RESEARCH")
+    print("🧠 DEEP INSIGHTS ASSISTANT - AI ANALYSIS")
     print("="*60)
     print(f"✅ FastAPI: Available")
-    print(f"{'✅' if RESEARCH_AVAILABLE else '❌'} Research Engine: {'Available' if RESEARCH_AVAILABLE else 'Not Available'}")
+    print(f"{'✅' if RESEARCH_AVAILABLE else '❌'} Analysis Engine: {'Available' if RESEARCH_AVAILABLE else 'Not Available'}")
     print("\n📱 Starting web server...")
     print("🌐 Open your browser and go to: http://localhost:8000")
-    print("🔬 This version conducts REAL research using OpenAI + Tavily")
+    print("🔬 This version conducts REAL AI analysis using OpenAI + Tavily")
     print("="*60)
     
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=False)

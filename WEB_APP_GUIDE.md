@@ -1,6 +1,6 @@
-# 🔬 Open Deep Research - Enhanced Web App
+# 🧠 Deep Insights Assistant - Enhanced Web App
 
-An AI-powered research assistant with **real-time streaming**, **thinking mode**, and **OpenAI Deep Research-like experience**.
+An AI-powered insights assistant with **real-time streaming**, **thinking mode**, and **OpenAI Deep Research-like experience** for AI topics.
 
 ## ✨ New Features
 
@@ -62,7 +62,7 @@ OPENAI_API_KEY=sk-your-openai-key-here
 TAVILY_API_KEY=tvly-your-tavily-key-here
 ```
 
-### 3. Run the Enhanced Research App
+### 3. Run the Enhanced Insights App
 ```bash
 python real_research_app.py
 ```
@@ -72,10 +72,10 @@ Open your browser and navigate to: **http://localhost:8000**
 
 ## 🎮 How to Use
 
-### 1. **Enter Research Topic**
-- Type your research topic in the input field
+### 1. **Enter AI Analysis Topic**
+- Type your AI research topic in the input field
 - Or click one of the example topic chips
-- Examples: "Artificial Intelligence in Healthcare", "Climate Change Impact"
+- Examples: "Model Context Protocol Implementation", "Voice to Voice Agent Architecture"
 
 ### 2. **Watch AI Think & Research**
 - **🚀 Initialization**: AI starts up and analyzes your topic
