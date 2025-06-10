@@ -1,0 +1,25 @@
+# Enhanced Research Web App Requirements
+# Install with: pip install -r requirements-web-enhanced.txt
+
+# Core package (install in editable mode with: pip install -e .)
+# open_deep_research>=0.0.15
+
+# Web Framework
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+
+# WebSocket Support
+websockets>=11.0
+
+# Template Engine
+jinja2>=3.1.0
+
+# Environment Variables
+python-dotenv>=1.0.0
+
+# Already included in main package but listing for reference:
+# openai>=1.61.0
+# tavily-python>=0.5.0
+# langgraph>=0.2.55
+# langchain-openai>=0.3.7
+# langchain-community>=0.3.9 
