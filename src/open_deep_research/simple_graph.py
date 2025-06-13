@@ -78,6 +78,14 @@ async def generate_initial_summary(state: SimpleReportState, config: RunnableCon
     
     topic = state["topic"]
     
+    # Send progress update
+    if "progress_callback" in config["configurable"]:
+        await config["configurable"]["progress_callback"](
+            "planning",
+            "Analyzing topic and creating research outline...",
+            10
+        )
+    
     # Initialize model
     model = init_chat_model(
         model="gpt-4o",
@@ -107,6 +115,15 @@ The 3 sections should provide comprehensive coverage of the topic from different
         "Section 2": result.section_2, 
         "Section 3": result.section_3
     }
+    
+    # Send progress update
+    if "progress_callback" in config["configurable"]:
+        await config["configurable"]["progress_callback"](
+            "planning_complete",
+            "Research outline created with 3 sections",
+            25,
+            {"sections": initial_sections}
+        )
     
     return {"initial_sections": initial_sections}
 
@@ -141,6 +158,14 @@ async def process_section(state: SectionProcessingState, config: RunnableConfig)
     )
     
     # Step 1: Generate sub-queries for this section
+    if "progress_callback" in config["configurable"]:
+        await config["configurable"]["progress_callback"](
+            "query_generation",
+            f"Generating search queries for section: {section_name}",
+            35,
+            {"section_name": section_name}
+        )
+    
     query_system_prompt = """You are a research assistant. Generate specific search queries to gather comprehensive information for a research section.
 
 Generate 3 focused search queries that will help gather detailed information for the given section."""
@@ -161,17 +186,42 @@ Generate 3 specific search queries for this section."""
     queries = query_result.queries
     
     # Step 2: Retrieve content using Tavily search
+    if "progress_callback" in config["configurable"]:
+        await config["configurable"]["progress_callback"](
+            "researching",
+            f"Conducting web searches for section: {section_name}",
+            50,
+            {"section_name": section_name, "queries": queries}
+        )
+    
     search_params = {"max_results": 5}
-    content = await select_and_execute_search("tavily", queries, search_params)
+    search_results = await select_and_execute_search("tavily", queries, search_params)
+    
+    # Sources tracking removed per user request
+    content = search_results
     
     # Step 3: Create detailed summary based on retrieved content
+    if "progress_callback" in config["configurable"]:
+        await config["configurable"]["progress_callback"](
+            "writing",
+            f"Writing detailed summary for section: {section_name}",
+            75,
+            {"section_name": section_name}
+        )
+    
     summary_system_prompt = """You are a research analyst. Create a comprehensive, detailed summary for a research section based on the provided search results.
 
 The summary should:
-- Be well-structured and informative
+- Be well-structured with clear subsections using markdown headers (###, ####)
+- Create 3-4 subsections within the main section to organize the content
 - Include key facts, insights, and relevant details from the search results
+- Use proper markdown formatting with headers and subheaders
 - Be substantial enough to stand as a complete section in a research report
-- Maintain objectivity and cite important findings"""
+- Maintain objectivity and cite important findings
+- IMPORTANT: Do NOT include conclusions, final thoughts, or summary statements
+- Focus on presenting information and findings without concluding remarks
+- Avoid phrases like "In conclusion", "Overall", "To summarize", etc.
+- Structure content with clear subsections like "### Key Concepts", "### Implementation Details", "### Current Developments", etc."""
 
     summary_user_prompt = f"""Section: {section_name}
 Description: {section_description}
@@ -204,6 +254,14 @@ async def generate_final_report(state: SimpleReportState, config: RunnableConfig
     topic = state["topic"]
     section_results = state["section_results"]
     
+    # Send progress update
+    if "progress_callback" in config["configurable"]:
+        await config["configurable"]["progress_callback"](
+            "finalizing",
+            "Compiling final report...",
+            90
+        )
+    
     # Initialize model
     model = init_chat_model(
         model="gpt-4o",
@@ -212,38 +270,38 @@ async def generate_final_report(state: SimpleReportState, config: RunnableConfig
     
     # Prepare section content for the final report
     sections_text = ""
+    
     for section_result in section_results:
         section_name = section_result["section_name"]
         summary = section_result["summary"]
+        
         sections_text += f"\n\n## {section_name}\n{summary}"
     
-    system_prompt = """You are a professional report writer. Create a comprehensive final report that includes:
+    system_prompt = """You are a professional report compiler. Create a well-structured report using the provided sections.
 
-1. A compelling title for the report
-2. An executive summary that captures the key insights
-3. The detailed sections (already provided)
-4. A conclusion that synthesizes the findings and provides final thoughts
-
-The report should be well-structured, professional, and provide valuable insights on the topic."""
+IMPORTANT: 
+- Use ONLY the provided sections - do not create additional sections
+- Create a single executive summary (not multiple)
+- Do not duplicate any content
+- Keep the existing section content exactly as provided
+- Only add a title and brief conclusion if needed"""
 
     user_prompt = f"""Topic: {topic}
 
-Detailed Sections:{sections_text}
+Sections to compile:{sections_text}
 
-Create a final comprehensive report with:
-- Title
-- Executive Summary  
-- The sections above (keep them as-is)
-- Conclusion
+Create a clean, professional report with this EXACT structure:
+1. A clear title (# Title format)
+2. One executive summary paragraph (2-3 sentences)
+3. The exact sections provided above (do not modify their content)
+4. One brief conclusion paragraph (2-3 sentences maximum)"""
 
-Format this as a complete, professional report."""
-
-    final_result = await model.ainvoke([
+    final_report = await model.ainvoke([
         SystemMessage(content=system_prompt),
         HumanMessage(content=user_prompt)
     ])
     
-    return {"final_report": final_result.content}
+    return {"final_report": final_report.content}
 
 
 # Build the graph

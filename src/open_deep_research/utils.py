@@ -199,7 +199,7 @@ async def tavily_search_async(search_queries, max_results: int = 5, topic: Liter
                     ]
                 }
     """
-    tavily_async_client = AsyncTavilyClient()
+    tavily_async_client = AsyncTavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
     search_tasks = []
     for query in search_queries:
             search_tasks.append(

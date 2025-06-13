@@ -71,6 +71,8 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
             if message["type"] == "start_research":
                 topic = message["topic"]
                 await run_research_with_updates(session_id, topic)
+            elif message["type"] == "regenerate_section":
+                await regenerate_section_with_feedback(session_id, message)
             
     except WebSocketDisconnect:
         manager.disconnect(session_id)
@@ -108,47 +110,18 @@ async def run_research_with_updates(session_id: str, topic: str):
             "progress": 10
         })
         
-        # We'll need to modify the graph to get intermediate results
-        # For now, let's run the full workflow and simulate updates
+        # Create a callback function to receive progress updates
+        async def progress_callback(step: str, message: str, progress: int, details: dict = None):
+            await manager.send_update(session_id, {
+                "type": "status",
+                "step": step,
+                "message": message,
+                "progress": progress,
+                "details": details
+            })
         
-        await manager.send_update(session_id, {
-            "type": "status", 
-            "step": "planning_complete",
-            "message": "Research outline created with 3 sections",
-            "progress": 25
-        })
-        
-        # Step 2: Generate Queries
-        await manager.send_update(session_id, {
-            "type": "status",
-            "step": "query_generation", 
-            "message": "Generating targeted search queries for each section...",
-            "progress": 35
-        })
-        
-        # Step 3: Search and Research
-        await manager.send_update(session_id, {
-            "type": "status",
-            "step": "researching",
-            "message": "Conducting web searches and gathering information...",
-            "progress": 50
-        })
-        
-        # Step 4: Writing Sections
-        await manager.send_update(session_id, {
-            "type": "status", 
-            "step": "writing",
-            "message": "Analyzing search results and writing detailed sections...",
-            "progress": 75
-        })
-        
-        # Step 5: Final Report
-        await manager.send_update(session_id, {
-            "type": "status",
-            "step": "finalizing",
-            "message": "Compiling final report...", 
-            "progress": 90
-        })
+        # Add progress callback to config
+        config["configurable"]["progress_callback"] = progress_callback
         
         # Run the actual research
         result = await simple_graph.ainvoke({"topic": topic}, config=config)
@@ -179,6 +152,154 @@ async def run_research_with_updates(session_id: str, topic: str):
             "type": "error",
             "message": f"Error during research: {str(e)}",
             "progress": 0
+        })
+
+
+async def regenerate_section_with_feedback(session_id: str, message: dict):
+    """Regenerate a specific section based on user feedback."""
+    
+    try:
+        section_title = message.get("section_title", "")
+        section_content = message.get("section_content", "")
+        feedback = message.get("feedback", "")
+        topic = message.get("topic", "")
+        
+        if not all([section_title, feedback, topic]):
+            await manager.send_update(session_id, {
+                "type": "section_complete",
+                "success": False,
+                "error": "Missing required information for section regeneration"
+            })
+            return
+        
+        # Send initial status
+        await manager.send_update(session_id, {
+            "type": "status",
+            "step": "regenerating",
+            "message": f"Regenerating section: {section_title}",
+            "progress": 0
+        })
+        
+        # Import required modules for section regeneration
+        from langchain.chat_models import init_chat_model
+        from langchain_core.messages import HumanMessage, SystemMessage
+        from pydantic import BaseModel, Field
+        from typing import List
+        from open_deep_research.utils import select_and_execute_search
+        
+        # Pydantic model for structured query generation
+        class RegenerationQueries(BaseModel):
+            """Queries for section regeneration based on feedback."""
+            queries: List[str] = Field(description="List of search queries to address the feedback")
+        
+        # Initialize model
+        model = init_chat_model(
+            model="gpt-4o",
+            model_provider="openai"
+        )
+        
+        # Step 1: Generate new search queries based on feedback
+        await manager.send_update(session_id, {
+            "type": "status",
+            "step": "regenerating",
+            "message": "Generating new search queries based on feedback...",
+            "progress": 25
+        })
+        
+        query_system_prompt = """You are a research assistant. Based on user feedback about a section, generate 3-4 specific search queries that will help gather information to address the feedback and improve the section.
+
+Focus on the specific improvements requested in the feedback."""
+
+        query_user_prompt = f"""Topic: {topic}
+Section Title: {section_title}
+Original Section Content: {section_content}
+User Feedback: {feedback}
+
+Generate 3-4 specific search queries that will help address the feedback and improve this section."""
+
+        structured_query_model = model.with_structured_output(RegenerationQueries)
+        
+        query_result = await structured_query_model.ainvoke([
+            SystemMessage(content=query_system_prompt),
+            HumanMessage(content=query_user_prompt)
+        ])
+        
+        queries = query_result.queries
+        
+        # Step 2: Perform web search
+        await manager.send_update(session_id, {
+            "type": "status",
+            "step": "regenerating",
+            "message": "Searching for updated information...",
+            "progress": 50
+        })
+        
+        search_params = {"max_results": 5}
+        search_results = await select_and_execute_search("tavily", queries, search_params)
+        
+        # Step 3: Regenerate the section
+        await manager.send_update(session_id, {
+            "type": "status",
+            "step": "regenerating",
+            "message": "Rewriting section with new information...",
+            "progress": 75
+        })
+        
+        regeneration_system_prompt = """You are a research analyst. Enhance and improve a research section based on user feedback and new search results.
+
+The enhanced section should:
+- KEEP the valuable content from the original section
+- ENHANCE it by incorporating relevant information from the new search results
+- ADDRESS the specific feedback provided by the user
+- EXPAND on areas mentioned in the feedback
+- Maintain the same structure and formatting as a research section
+- Use proper markdown formatting with headers (###, ####)
+- Be comprehensive and well-organized
+- Focus on the improvements requested in the feedback while preserving good existing content
+- IMPORTANT: Do NOT include conclusions, final thoughts, or summary statements
+- Avoid phrases like "In conclusion", "Overall", "To summarize", etc.
+- Structure content with clear subsections
+
+Return ONLY the enhanced section content, not the entire report."""
+
+        regeneration_user_prompt = f"""Topic: {topic}
+Section Title: {section_title}
+Original Section Content: {section_content}
+User Feedback: {feedback}
+
+New Search Results:
+{search_results}
+
+ENHANCE the original section by:
+1. Keeping the valuable existing content
+2. Adding new information from the search results that addresses the feedback
+3. Expanding on areas mentioned in the feedback
+4. Improving the overall quality and depth
+
+Return the enhanced section with proper markdown formatting."""
+
+        regenerated_result = await model.ainvoke([
+            SystemMessage(content=regeneration_system_prompt),
+            HumanMessage(content=regeneration_user_prompt)
+        ])
+        
+        new_section_content = regenerated_result.content
+        
+        # Send completion
+        await manager.send_update(session_id, {
+            "type": "section_complete",
+            "success": True,
+            "section_title": section_title,
+            "new_content": new_section_content,
+            "message": f"Section '{section_title}' regenerated successfully!"
+        })
+        
+    except Exception as e:
+        await manager.send_update(session_id, {
+            "type": "section_complete",
+            "success": False,
+            "section_title": message.get("section_title", ""),
+            "error": f"Error regenerating section: {str(e)}"
         })
 
 

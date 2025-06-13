@@ -49,7 +49,7 @@ def check_dependencies():
     for package in required_packages:
         try:
             if package == 'tavily':
-                __import__('tavily_python')
+                __import__('tavily')
             else:
                 __import__(package.replace('-', '_'))
             print(f"  ✅ {package}")
